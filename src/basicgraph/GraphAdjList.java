@@ -1,5 +1,6 @@
 package basicgraph;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,18 @@ public class GraphAdjList extends Graph {
 	 */		
 	 public List<Integer> getDistance2(int v) {
 		 // XXX: Implement this method in week 2
-		 return null;
+         List<Integer> firstNeighbours = adjListsMap.get(v);
+         List<Integer> secondNeighbours = new ArrayList<>();
+
+         for (Integer firstNeighbour : firstNeighbours) {
+             int neighbour = firstNeighbour;
+             List<Integer> neigbs = getNeighbors(neighbour);
+
+             secondNeighbours.addAll(neigbs);
+
+         }
+
+		 return secondNeighbours;
 	}
 	
 	/**

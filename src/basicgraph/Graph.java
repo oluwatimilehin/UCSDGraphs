@@ -264,7 +264,7 @@ public abstract class Graph {
 		
 		System.out.println("Flight data:");
 		GraphAdjList airportGraph = new GraphAdjList();
-		GraphLoader.loadRoutes("data/airports/routesUA.dat", airportGraph);
+		GraphLoader.loadRoadMap("data/maps/ucsd.map", airportGraph);
 		System.out.println(airportGraph);
 		System.out.println("Observe most degrees are small (1-30), eight are over 100.");
 		System.out.println("****");
