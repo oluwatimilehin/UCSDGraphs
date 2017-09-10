@@ -61,6 +61,7 @@ public class MapGraph {
 	{
 	    int numEdges = 0;
 
+	    //This sums up the size of the lists for each vertex
 	    for(List<GeographicPoint> points : map.values()){
 	        numEdges = numEdges + points.size();
         }
@@ -120,6 +121,10 @@ public class MapGraph {
 	    return  map.get(point);
     }
 
+    /**
+     * I added this method for testing purposes
+     * @param mapGraph
+     */
 	public static void printGraph(MapGraph mapGraph){
         for(GeographicPoint point : mapGraph.getVertices()){
             String graph = point.toString() + " ->";
@@ -227,6 +232,12 @@ public class MapGraph {
         return  nodeFound;
     }
 
+    /**
+     * Method added for debugging purposes
+     * @param start
+     * @param end
+     * @return
+     */
 	private String printBFS(GeographicPoint start, GeographicPoint end){
 	    List<GeographicPoint> path = this.bfs(start, end);
 
