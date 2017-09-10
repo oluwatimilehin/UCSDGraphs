@@ -8,8 +8,7 @@
 package roadgraph;
 
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -23,15 +22,17 @@ import util.GraphLoader;
  *
  */
 public class MapGraph {
-	//TODO: Add your member variables here in WEEK 3
-	
+
+	private HashMap<GeographicPoint, LinkedList<GeographicPoint>> map;
+
 	
 	/** 
 	 * Create a new empty MapGraph 
 	 */
 	public MapGraph()
 	{
-		// TODO: Implement in this constructor in WEEK 3
+	    map = new HashMap<>();
+
 	}
 	
 	/**
@@ -40,8 +41,7 @@ public class MapGraph {
 	 */
 	public int getNumVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return 0;
+		return map.size();
 	}
 	
 	/**
@@ -50,8 +50,7 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return null;
+        return new HashSet<>(map.keySet());
 	}
 	
 	/**
@@ -60,8 +59,13 @@ public class MapGraph {
 	 */
 	public int getNumEdges()
 	{
-		//TODO: Implement this method in WEEK 3
-		return 0;
+	    int numEdges = 0;
+
+	    for(List<GeographicPoint> points : map.values()){
+	        numEdges = numEdges + points.size();
+        }
+
+        return numEdges;
 	}
 
 	
@@ -75,7 +79,13 @@ public class MapGraph {
 	 */
 	public boolean addVertex(GeographicPoint location)
 	{
-		// TODO: Implement this method in WEEK 3
+        if(location == null) return  false;
+
+        if(!map.containsKey(location)){
+            map.put(location, new LinkedList<>());
+            return true;
+        }
+
 		return false;
 	}
 	
@@ -94,10 +104,33 @@ public class MapGraph {
 	public void addEdge(GeographicPoint from, GeographicPoint to, String roadName,
 			String roadType, double length) throws IllegalArgumentException {
 
-		//TODO: Implement this method in WEEK 3
-		
+	    if(from == null || to == null || roadName == null || roadType == null){
+	        throw new IllegalArgumentException();
+        }
+
+	    if(!map.containsKey(from) || !map.containsKey(to) || length < 0){
+	        throw new IllegalArgumentException();
+        }
+
+        map.get(from).add(to);
+
 	}
-	
+
+	public  LinkedList<GeographicPoint> getEdges(GeographicPoint point){
+	    return  map.get(point);
+    }
+
+	public static void printGraph(MapGraph mapGraph){
+        for(GeographicPoint point : mapGraph.getVertices()){
+            String graph = point.toString() + " ->";
+            LinkedList<GeographicPoint> edges = mapGraph.getEdges(point);
+
+            for(GeographicPoint edge : edges){
+                graph = graph + edge.toString() + " ; ";
+            }
+            System.out.println(graph);
+        }
+    }
 
 	/** Find the path from start to goal using breadth first search
 	 * 
@@ -206,7 +239,9 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
-		
+
+		MapGraph.printGraph(firstMap);
+
 		// You can use this method for testing.  
 		
 		
