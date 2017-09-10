@@ -174,7 +174,7 @@ public class Maze {
 			return new LinkedList<MazeNode>();
 		}
 
-		HashMap<MazeNode, MazeNode> parentMap = new HashMap<MazeNode, MazeNode>();
+		HashMap<MazeNode, MazeNode> parentMap = new HashMap<>();
 		
 		HashSet<MazeNode> visited = new HashSet<MazeNode>();
 		Stack<MazeNode> toExplore = new Stack<MazeNode>();
@@ -189,7 +189,8 @@ public class Maze {
 				break;
 			}
 			List<MazeNode> neighbors = curr.getNeighbors();
-			ListIterator<MazeNode> it = neighbors.listIterator(neighbors.size());
+			ListIterator<MazeNode> it = neighbors.listIterator(neighbors.size()); //This list is being iterated
+			// backwards
 			while (it.hasPrevious()) {
 				MazeNode next = it.previous();
 				if (!visited.contains(next)) {
@@ -208,12 +209,18 @@ public class Maze {
 		// reconstruct the path
 		LinkedList<MazeNode> path = new LinkedList<MazeNode>();
 		MazeNode curr = goal;
-		while (curr != start) {
-			path.addFirst(curr);
-			curr = parentMap.get(curr);
-		}
-		path.addFirst(start);
+		reconstructPath(path, parentMap, start, curr);
+
 		return path;
+	}
+
+	private void reconstructPath(LinkedList<MazeNode> newPath, HashMap<MazeNode, MazeNode> parentMap,
+								 MazeNode start,  MazeNode current){
+		while (current != start) {
+			newPath.addFirst(current);
+			current = parentMap.get(current);//This gets the path in reverse
+		}
+		newPath.addFirst(start);
 	}
 	
 	
