@@ -159,28 +159,9 @@ public class MapGraph {
 	    HashMap<GeographicPoint, GeographicPoint> pathLink = new HashMap<>();
 		Queue<GeographicPoint> queue = new LinkedList<>();
 		HashSet<GeographicPoint> visited = new HashSet<>();
-		boolean nodeFound = false;
 		queue.add(start);
 
-		while (!queue.isEmpty()){
-	        GeographicPoint current = queue.poll();
-            nodeSearched.accept(current);
-
-	        if(current.equals(goal)){
-	            nodeFound = true;
-	            break;
-            }
-	        LinkedList<GeographicPoint> edges = this.getEdges(current);
-
-            for(GeographicPoint edge : edges){
-                if(!visited.contains(edge)){
-	                visited.add(edge);
-	                queue.add(edge);
-                    pathLink.put(edge, current);
-                }
-            }
-
-        }
+        boolean nodeFound = searchBFS(goal, queue, pathLink, visited, nodeSearched);
 
         if(!nodeFound){
 		    return new LinkedList<>() ;
@@ -189,18 +170,62 @@ public class MapGraph {
         // Hook for visualization.  See writeup.
         //nodeSearched.accept(next.getLocation());
 
-        LinkedList<GeographicPoint> path = new LinkedList<>();
         GeographicPoint curr = goal;
+        LinkedList<GeographicPoint> path = constructedPath(pathLink, curr, start);
 
-        while (curr != start){
-          path.addFirst(curr);
-          curr = pathLink.get(curr);
-        }
-
-        path.addFirst(start);
         return path;
 
 	}
+
+	private LinkedList<GeographicPoint> constructedPath(HashMap<GeographicPoint, GeographicPoint> pathLink,
+                                                        GeographicPoint curr, GeographicPoint start){
+	    LinkedList<GeographicPoint> localPath = new LinkedList<>();
+
+        while (curr != start){
+            localPath.addFirst(curr);
+            curr = pathLink.get(curr);
+        }
+
+        localPath.addFirst(start);
+
+        return localPath;
+    }
+
+    /**
+     * Method that perfoms the BFS search
+     * @param goal
+     * @param queue
+     * @param pathLink
+     * @param nodesVisited
+     * @param nodeSearched
+     * @return
+     */
+	private boolean searchBFS(GeographicPoint goal, Queue<GeographicPoint> queue, HashMap<GeographicPoint,GeographicPoint>
+            pathLink, HashSet<GeographicPoint> nodesVisited, Consumer<GeographicPoint> nodeSearched){
+
+	    boolean nodeFound = false;
+
+        while (!queue.isEmpty()){
+            GeographicPoint current = queue.poll();
+            nodeSearched.accept(current);
+
+            if(current.equals(goal)){
+                nodeFound = true;
+                break;
+            }
+            LinkedList<GeographicPoint> edges = this.getEdges(current);
+
+            for(GeographicPoint edge : edges){
+                if(!nodesVisited.contains(edge)){
+                    nodesVisited.add(edge);
+                    queue.add(edge);
+                    pathLink.put(edge, current);
+                }
+            }
+
+        }
+        return  nodeFound;
+    }
 
 	private String printBFS(GeographicPoint start, GeographicPoint end){
 	    List<GeographicPoint> path = this.bfs(start, end);
