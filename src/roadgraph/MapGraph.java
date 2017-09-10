@@ -156,14 +156,63 @@ public class MapGraph {
 	public List<GeographicPoint> bfs(GeographicPoint start, 
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 3
-		
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
+	    HashMap<GeographicPoint, GeographicPoint> pathLink = new HashMap<>();
+		Queue<GeographicPoint> queue = new LinkedList<>();
+		HashSet<GeographicPoint> visited = new HashSet<>();
+		boolean nodeFound = false;
+		queue.add(start);
 
-		return null;
+		while (!queue.isEmpty()){
+	        GeographicPoint current = queue.poll();
+            nodeSearched.accept(current);
+
+	        if(current.equals(goal)){
+	            nodeFound = true;
+	            break;
+            }
+	        LinkedList<GeographicPoint> edges = this.getEdges(current);
+
+            for(GeographicPoint edge : edges){
+                if(!visited.contains(edge)){
+	                visited.add(edge);
+	                queue.add(edge);
+                    pathLink.put(edge, current);
+                }
+            }
+
+        }
+
+        if(!nodeFound){
+		    return new LinkedList<>() ;
+        }
+
+        // Hook for visualization.  See writeup.
+        //nodeSearched.accept(next.getLocation());
+
+        LinkedList<GeographicPoint> path = new LinkedList<>();
+        GeographicPoint curr = goal;
+
+        while (curr != start){
+          path.addFirst(curr);
+          curr = pathLink.get(curr);
+        }
+
+        path.addFirst(start);
+        return path;
+
 	}
-	
+
+	private String printBFS(GeographicPoint start, GeographicPoint end){
+	    List<GeographicPoint> path = this.bfs(start, end);
+
+	    String pathString = "";
+
+	    for(GeographicPoint node : path){
+	        pathString = pathString + node.toString() + "->";
+        }
+
+        return pathString;
+    }
 
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
@@ -240,7 +289,12 @@ public class MapGraph {
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
 
-		MapGraph.printGraph(firstMap);
+		GeographicPoint start = new GeographicPoint(1, 1);
+		GeographicPoint end = new GeographicPoint(8, -1);
+
+		System.out.println(firstMap.printBFS(start, end));
+
+		//MapGraph.printGraph(firstMap);
 
 		// You can use this method for testing.  
 		
