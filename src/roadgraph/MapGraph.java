@@ -157,7 +157,36 @@ public class MapGraph {
         HashMap<GeographicPoint,GeographicPoint> parent = new HashMap<>();
         HashSet<MapNode> visited = new HashSet<>();
 
-        boolean isFound = false;
+        boolean isFound = searchBFS(startNode, endNode, visited, parent, queue, nodeSearched);
+
+        if (!isFound) {
+            return null;
+        }
+
+        LinkedList<GeographicPoint> path = constructPath(parent, startNode, endNode);
+
+        return path;
+    }
+
+    private  LinkedList<GeographicPoint> constructPath(HashMap<GeographicPoint, GeographicPoint> parent, MapNode
+            startNode, MapNode endNode){
+        LinkedList<GeographicPoint> path = new LinkedList<>();
+
+        GeographicPoint node = endNode.getLocation();
+        path.addFirst(node);
+
+        while (node != startNode.getLocation()) {
+            node = parent.get(node);
+            path.addFirst(node);
+        }
+
+        return path;
+    }
+
+    private boolean searchBFS(MapNode startNode, MapNode endNode, HashSet<MapNode> visited, HashMap<GeographicPoint,
+            GeographicPoint> parent, Queue<MapNode> queue, Consumer<GeographicPoint> nodeSearched){
+
+        boolean isFound;
 
         queue.add(startNode);
         visited.add(startNode);
@@ -171,7 +200,7 @@ public class MapGraph {
 
             if (current == endNode) {
                 isFound = true;
-                break;
+                return isFound;
             }
 
             LinkedList<MapEdge> edges = current.getEdges();
@@ -189,23 +218,15 @@ public class MapGraph {
 
         }
 
-        if (!isFound) {
-            return null;
-        }
-
-        GeographicPoint node = endNode.getLocation();
-        LinkedList<GeographicPoint> path = new LinkedList<>();
-        path.addFirst(node);
-
-        while (node != startNode.getLocation()) {
-            node = parent.get(node);
-            path.addFirst(node);
-        }
-
-        return path;
+        return false;
     }
 
-
+    /**
+     * Method for debugging
+     * @param start
+     * @param end
+     * @return
+     */
     public String printBFS(GeographicPoint start, GeographicPoint end) {
 
         List<GeographicPoint> path = bfs(start, end);
