@@ -84,7 +84,7 @@ public class MapGraph {
 	{
 		MapNode newNode = new MapNode(location);
 
-		if(nodes.contains(newNode) || location == null) {
+		if( location == null || nodes.contains(newNode) ) {
 			return false;
 		}
 
@@ -111,7 +111,10 @@ public class MapGraph {
 		MapNode sourceNode = new MapNode(from);
 		MapNode destinationNode = new MapNode(to);
 
-		if(!nodes.contains(sourceNode) || !nodes.contains(destinationNode) || length < 0 || roadName == null ||
+		if(from == null || to == null || !nodes.contains(sourceNode) || !nodes.contains
+				(destinationNode)	|| length < 0 ||
+				roadName ==
+				null ||
 				roadType == null){
 			throw new IllegalArgumentException();
 		}
