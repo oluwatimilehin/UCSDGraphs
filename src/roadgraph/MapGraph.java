@@ -160,13 +160,14 @@ public class MapGraph {
         boolean isFound = false;
 
         queue.add(startNode);
+        visited.add(startNode);
 
         while (!queue.isEmpty()) {
             MapNode current = queue.poll();
             current = nodes.get(nodes.indexOf(current));
 
             nodeSearched.accept(current.getLocation());
-            visited.add(current);
+
 
             if (current == endNode) {
                 isFound = true;
@@ -180,6 +181,7 @@ public class MapGraph {
                 dest = nodes.get(nodes.indexOf(dest));
 
                 if (!visited.contains(dest)) {
+                    visited.add(dest);
                     queue.add(dest);
                     parent.put(dest.getLocation(), current.getLocation());
                 }
