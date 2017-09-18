@@ -23,12 +23,14 @@ import util.GraphLoader;
  */
 public class MapGraph {
 
+	ArrayList<MapNode> nodes;
+
 	/**
 	 * Create a new empty MapGraph
 	 */
 	public MapGraph()
 	{
-
+		nodes = new ArrayList<>();
 	}
 
 	/**
@@ -37,7 +39,7 @@ public class MapGraph {
 	 */
 	public int getNumVertices()
 	{
-		return 0;
+		return nodes.size();
 	}
 
 	/**
@@ -46,7 +48,13 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
-		return null;
+		Set<GeographicPoint> vertices = new HashSet<>();
+
+		for(MapNode node : nodes){
+			vertices.add(node.getLocation());
+		}
+
+		return vertices;
 	}
 
 	/**
@@ -55,7 +63,12 @@ public class MapGraph {
 	 */
 	public int getNumEdges()
 	{
-		return  0;
+		int size = 0;
+
+		for(MapNode node : nodes){
+			size += node.getEdges().size();
+		}
+		return  size;
 	}
 
 
@@ -69,7 +82,14 @@ public class MapGraph {
 	 */
 	public boolean addVertex(GeographicPoint location)
 	{
-		return false;
+		MapNode newNode = new MapNode(location);
+
+		if(nodes.contains(newNode) || location == null) {
+			return false;
+		}
+
+		nodes.add(newNode);
+		return true;
 	}
 
 	/**
@@ -87,7 +107,16 @@ public class MapGraph {
 	public void addEdge(GeographicPoint from, GeographicPoint to, String roadName,
 			String roadType, double length) throws IllegalArgumentException {
 
+		MapEdge edge = new MapEdge(from, to, roadName, roadType, length);
+		MapNode sourceNode = new MapNode(from);
+		MapNode destinationNode = new MapNode(to);
 
+		if(!nodes.contains(sourceNode) || !nodes.contains(destinationNode) || length < 0 || roadName == null ||
+				roadType == null){
+			throw new IllegalArgumentException();
+		}
+
+		nodes.get(nodes.indexOf(sourceNode)).addEdge(edge);
 
 	}
 
