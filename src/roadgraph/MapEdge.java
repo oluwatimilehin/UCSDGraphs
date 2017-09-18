@@ -6,8 +6,8 @@ import java.util.*;
 
 public class MapEdge {
 
-    GeographicPoint from;
-    GeographicPoint to;
+    private GeographicPoint from;
+    private GeographicPoint to;
 
     public GeographicPoint getFrom() {
         return from;
@@ -29,9 +29,9 @@ public class MapEdge {
         return length;
     }
 
-    String roadName;
-    String roadType;
-    double length;
+    private String roadName;
+    private String roadType;
+    private double length;
 
     public MapEdge(GeographicPoint from, GeographicPoint to, String roadName, String roadType, double length) {
         this.from = from;
