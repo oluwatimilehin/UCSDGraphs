@@ -141,11 +141,20 @@ public class MapGraph {
      */
     public List<GeographicPoint> bfs(GeographicPoint start,
                                      GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
+
+
         MapNode startNode = new MapNode(start);
         MapNode endNode = new MapNode(goal);
 
+        if(!nodes.contains(startNode) || !nodes.contains(endNode)){
+            return null;
+        }
+
+        startNode = nodes.get(nodes.indexOf(startNode));
+        endNode = nodes.get(nodes.indexOf(endNode));
+
         Queue<MapNode> queue = new LinkedList<>();
-        HashMap<MapNode, MapNode> parent = new HashMap<>();
+        HashMap<GeographicPoint,GeographicPoint> parent = new HashMap<>();
         HashSet<MapNode> visited = new HashSet<>();
 
         boolean isFound = false;
@@ -154,6 +163,7 @@ public class MapGraph {
 
         while (!queue.isEmpty()) {
             MapNode current = queue.poll();
+            current = nodes.get(nodes.indexOf(current));
 
             nodeSearched.accept(current.getLocation());
             visited.add(current);
@@ -167,10 +177,11 @@ public class MapGraph {
 
             for (MapEdge edge : edges) {
                 MapNode dest = new MapNode(edge.getTo());
+                dest = nodes.get(nodes.indexOf(dest));
 
                 if (!visited.contains(dest)) {
                     queue.add(dest);
-                    parent.put(dest, current);
+                    parent.put(dest.getLocation(), current.getLocation());
                 }
             }
 
@@ -180,13 +191,13 @@ public class MapGraph {
             return null;
         }
 
-        MapNode node = endNode;
+        GeographicPoint node = endNode.getLocation();
         LinkedList<GeographicPoint> path = new LinkedList<>();
-        path.addFirst(node.getLocation());
+        path.addFirst(node);
 
-        while (node != startNode) {
+        while (node != startNode.getLocation()) {
             node = parent.get(node);
-            path.addFirst(node.getLocation());
+            path.addFirst(node);
         }
 
         return path;
@@ -199,8 +210,10 @@ public class MapGraph {
 
         String pathToString = "";
 
+        if(path == null) return null;
+
         for (GeographicPoint point : path) {
-            pathToString += point.toString();
+            pathToString += point.toString() + "->";
         }
 
         return pathToString;
@@ -283,7 +296,7 @@ public class MapGraph {
         GeographicPoint start = new GeographicPoint(1, 1);
         GeographicPoint end = new GeographicPoint(8, -1);
 
-        printBFS(start, end);
+        System.out.println(firstMap.printBFS(start, end));
 
         //MapGraph.printGraph(firstMap);
 

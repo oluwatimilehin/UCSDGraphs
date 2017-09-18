@@ -6,8 +6,8 @@ import java.util.*;
 
 public class MapNode {
 
-    GeographicPoint location;
-    LinkedList<MapEdge> edges = new LinkedList<>();
+    private GeographicPoint location;
+    private  LinkedList<MapEdge> edges = new LinkedList<>();
 
     public MapNode(GeographicPoint location) {
         this.location = location;
@@ -22,7 +22,7 @@ public class MapNode {
     }
 
     public void addEdge(MapEdge edge){
-        edges.add(edge);
+        this.edges.add(edge);
     }
 
     public LinkedList<MapEdge> getEdges() {
