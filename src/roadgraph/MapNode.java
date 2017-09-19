@@ -4,13 +4,24 @@ import geography.GeographicPoint;
 
 import java.util.*;
 
-public class MapNode {
+public class MapNode implements Comparable<MapNode> {
 
     private GeographicPoint location;
-    private  LinkedList<MapEdge> edges = new LinkedList<>();
+    private LinkedList<MapEdge> edges = new LinkedList<>();
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    private double distance;
 
     public MapNode(GeographicPoint location) {
         this.location = location;
+        this.distance = 0;
     }
 
     public GeographicPoint getLocation() {
@@ -37,5 +48,10 @@ public class MapNode {
         }
 
         return false;
+    }
+
+    @Override
+    public int compareTo(MapNode o) {
+        return Double.compare(this.distance, o.distance);
     }
 }

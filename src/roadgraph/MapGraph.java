@@ -23,6 +23,8 @@ import util.GraphLoader;
 public class MapGraph {
 
     ArrayList<MapNode> nodes;
+    private static final String CONST_DIJKSTRA = "dirjkstra";
+    private static final String CONST_BFS = "bfs";
 
     /**
      * Create a new empty MapGraph
@@ -227,9 +229,16 @@ public class MapGraph {
      * @param end
      * @return
      */
-    public String printBFS(GeographicPoint start, GeographicPoint end) {
+    public String printSearch(GeographicPoint start, GeographicPoint end, String search) {
 
-        List<GeographicPoint> path = bfs(start, end);
+        List<GeographicPoint> path = new LinkedList<>();
+
+        if(search.equals(CONST_BFS)){
+            path = bfs(start, end);
+        }else if(search.equals(CONST_DIJKSTRA)){
+            path = dijkstra(start,end);
+        }
+
 
         String pathToString = "";
 
@@ -241,6 +250,8 @@ public class MapGraph {
 
         return pathToString;
     }
+
+
 
 
     /** Find the path from start to goal using Dijkstra's algorithm
@@ -266,14 +277,68 @@ public class MapGraph {
      * @return The list of intersections that form the shortest path from
      *   start to goal (including both start and goal).
      */
-    public List<GeographicPoint> dijkstra(GeographicPoint start,
-                                          GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
-        // TODO: Implement this method in WEEK 4
+    public List<GeographicPoint> dijkstra(GeographicPoint start,GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
 
-        // Hook for visualization.  See writeup.
-        //nodeSearched.accept(next.getLocation());
+        MapNode startNode = new MapNode(start);
+        MapNode endNode = new MapNode(goal);
 
-        return null;
+        if(!nodes.contains(startNode) || !nodes.contains(endNode)){
+            return null;
+        }
+
+        startNode = nodes.get(nodes.indexOf(startNode));
+        endNode = nodes.get(nodes.indexOf(endNode));
+
+        PriorityQueue<MapNode> pQueue = new PriorityQueue<>();
+        HashMap<GeographicPoint, GeographicPoint> parent = new HashMap<>();
+        HashSet<MapNode> visited = new HashSet<>();
+        boolean isFound = false;
+
+        for(MapNode node : nodes){
+            node.setDistance(Integer.MAX_VALUE);
+        }
+
+        pQueue.add(startNode);
+        startNode.setDistance(0);
+
+
+        while (!pQueue.isEmpty()){
+            MapNode current = pQueue.poll();
+            visited.add(current);
+            nodeSearched.accept(current.getLocation());
+
+            if(current == endNode){
+                isFound  = true;
+                break;
+            }
+
+            LinkedList<MapEdge> edges = current.getEdges();
+
+            for(MapEdge edge : edges){
+                GeographicPoint dest = edge.getTo();
+                MapNode destNode = new MapNode(dest);
+                destNode = nodes.get(nodes.indexOf(destNode));
+                double weight = edge.getLength();
+                double destNodeDistance = destNode.getDistance();
+
+                if (current.getDistance() + weight < destNodeDistance) {
+                        destNode.setDistance(current.getDistance() + weight);
+                        pQueue.add(destNode);
+                        parent.put(dest, current.getLocation());
+                    }
+            }
+
+        }
+
+        if(!isFound){
+            System.out.println("Node not found");
+            return null;
+        }
+
+        List<GeographicPoint> path = constructPath(parent, startNode, endNode);
+
+        return path;
+
     }
 
     /** Find the path from start to goal using A-Star search
@@ -319,8 +384,8 @@ public class MapGraph {
         GeographicPoint start = new GeographicPoint(1, 1);
         GeographicPoint end = new GeographicPoint(8, -1);
 
-        System.out.println(firstMap.printBFS(start, end));
-
+        System.out.println(firstMap.printSearch(start, end, CONST_BFS));
+        System.out.println(firstMap.printSearch(start,end, CONST_DIJKSTRA));
         //MapGraph.printGraph(firstMap);
 
         // You can use this method for testing.
@@ -330,6 +395,7 @@ public class MapGraph {
          * the Week 3 End of Week Quiz, EVEN IF you score 100% on the
 		 * programming assignment.
 		 */
+
 		/*
 		MapGraph simpleTestMap = new MapGraph();
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap);
@@ -338,8 +404,10 @@ public class MapGraph {
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
 		System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
-		List<GeographicPoint> testroute = simpleTestMap.dijkstra(testStart,testEnd);
-		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart,testEnd);
+		System.out.println(simpleTestMap.printSearch(testStart, testEnd, "dijkstra"));
+//		List<GeographicPoint> testroute = simpleTestMap.dijkstra(testStart,testEnd);
+//		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart,testEnd);
+
 
 
 		MapGraph testMap = new MapGraph();
