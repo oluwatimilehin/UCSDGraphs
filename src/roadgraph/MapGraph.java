@@ -23,6 +23,7 @@ public class MapGraph {
 
     private static final String CONST_DIJKSTRA = "dijkstra";
     private static final String CONST_BFS = "bfs";
+    private static final String CONST_ASTAR = "astar";
     ArrayList<MapNode> nodes;
 
     /**
@@ -44,6 +45,7 @@ public class MapGraph {
 
         System.out.println(firstMap.printSearch(start, end, CONST_BFS));
         System.out.println(firstMap.printSearch(start, end, CONST_DIJKSTRA));
+        System.out.println(firstMap.printSearch(start, end, CONST_ASTAR));
         //MapGraph.printGraph(firstMap);
 
         // You can use this method for testing.
@@ -321,6 +323,8 @@ public class MapGraph {
             path = bfs(start, end);
         } else if (search.equals(CONST_DIJKSTRA)) {
             path = dijkstra(start, end);
+        } else if(search.equals(CONST_ASTAR)){
+            path = aStarSearch(start, end);
         }
 
         String pathToString = "";
@@ -454,12 +458,68 @@ public class MapGraph {
      */
     public List<GeographicPoint> aStarSearch(GeographicPoint start,
                                              GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
-        // TODO: Implement this method in WEEK 4
 
-        // Hook for visualization.  See writeup.
-        //nodeSearched.accept(next.getLocation());
+        MapNode startNode = new MapNode(start);
+        MapNode endNode = new MapNode(goal);
 
-        return null;
+        if (!nodes.contains(startNode) || !nodes.contains(endNode)) {
+            return null;
+        }
+
+        startNode = nodes.get(nodes.indexOf(startNode));
+        endNode = nodes.get(nodes.indexOf(endNode));
+
+        PriorityQueue<MapNode> pQueue = new PriorityQueue<>();
+        HashMap<GeographicPoint, GeographicPoint> parent = new HashMap<>();
+        HashSet<MapNode> visited = new HashSet<>();
+
+        boolean isFound = false;
+
+        for (MapNode node : nodes) {
+            node.setDistance(Integer.MAX_VALUE);
+        }
+
+        pQueue.add(startNode);
+        startNode.setDistance(0);
+
+
+        while (!pQueue.isEmpty()){
+            MapNode currentNode = pQueue.poll();
+            currentNode = nodes.get(nodes.indexOf(currentNode));
+            nodeSearched.accept(currentNode.getLocation());
+            visited.add(currentNode);
+
+            if(currentNode == endNode){
+                isFound = true;
+                break;
+            }
+
+            LinkedList<MapEdge> edges = currentNode.getEdges();
+
+            for (MapEdge edge : edges) {
+                GeographicPoint dest = edge.getTo();
+                double distanceFromEnd = dest.distance(goal);
+                MapNode destNode = new MapNode(dest);
+                destNode = nodes.get(nodes.indexOf(destNode));
+                double weight = edge.getLength();
+                double destNodeDistance = destNode.getDistance();
+                double distanceFromStart = currentNode.getDistance() + weight;
+
+                if (distanceFromStart + distanceFromEnd < destNodeDistance) {
+                    destNode.setDistance(distanceFromStart + distanceFromEnd);
+                    pQueue.add(destNode);
+                    parent.put(dest, currentNode.getLocation());
+                }
+            }
+
+        }
+
+        if (!isFound) {
+            System.out.println("Node not found");
+            return null;
+        }
+
+        return constructPath(parent, startNode, endNode);
     }
 
 }
