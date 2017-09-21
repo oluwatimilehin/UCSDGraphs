@@ -8,6 +8,7 @@ public class MapNode implements Comparable<MapNode> {
 
     private GeographicPoint location;
     private LinkedList<MapEdge> edges = new LinkedList<>();
+    private double predictedDistance;
 
     public double getDistance() {
         return distance;
@@ -53,5 +54,13 @@ public class MapNode implements Comparable<MapNode> {
     @Override
     public int compareTo(MapNode o) {
         return Double.compare(this.distance, o.distance);
+    }
+
+    public double getPredictedDistance() {
+        return predictedDistance;
+    }
+
+    public void setPredictedDistance(double predictedDistance) {
+        this.predictedDistance = predictedDistance;
     }
 }
