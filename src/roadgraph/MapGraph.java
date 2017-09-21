@@ -473,15 +473,26 @@ public class MapGraph {
         HashMap<GeographicPoint, GeographicPoint> parent = new HashMap<>();
         HashSet<MapNode> visited = new HashSet<>();
 
-        boolean isFound = false;
+        boolean isFound = searchAstar(pQueue, parent, visited, startNode, endNode, nodeSearched);
 
+
+        if (!isFound) {
+            System.out.println("Node not found");
+            return null;
+        }
+
+        return constructPath(parent, startNode, endNode);
+    }
+
+    private boolean searchAstar(PriorityQueue<MapNode> pQueue, HashMap<GeographicPoint, GeographicPoint> parent,
+                                HashSet<MapNode> visited, MapNode startNode, MapNode endNode,
+                                Consumer<GeographicPoint> nodeSearched){
         for (MapNode node : nodes) {
             node.setDistance(Integer.MAX_VALUE);
         }
 
         pQueue.add(startNode);
         startNode.setDistance(0);
-
 
         while (!pQueue.isEmpty()){
             MapNode currentNode = pQueue.poll();
@@ -490,36 +501,33 @@ public class MapGraph {
             visited.add(currentNode);
 
             if(currentNode == endNode){
-                isFound = true;
-                break;
+                return true;
             }
 
             LinkedList<MapEdge> edges = currentNode.getEdges();
+            addNodes(edges, pQueue, currentNode, endNode, parent);
+        }
 
-            for (MapEdge edge : edges) {
-                GeographicPoint dest = edge.getTo();
-                double distanceFromEnd = dest.distance(goal);
-                MapNode destNode = new MapNode(dest);
-                destNode = nodes.get(nodes.indexOf(destNode));
-                double weight = edge.getLength();
-                double destNodeDistance = destNode.getDistance();
-                double distanceFromStart = currentNode.getDistance() + weight;
+        return false;
+    }
 
-                if (distanceFromStart + distanceFromEnd < destNodeDistance) {
-                    destNode.setDistance(distanceFromStart + distanceFromEnd);
-                    pQueue.add(destNode);
-                    parent.put(dest, currentNode.getLocation());
-                }
+    private void addNodes(LinkedList<MapEdge> edges, PriorityQueue<MapNode> pQueue, MapNode current, MapNode endNode,
+                          HashMap<GeographicPoint, GeographicPoint> parent){
+        for (MapEdge edge : edges) {
+            GeographicPoint dest = edge.getTo();
+            double distanceFromEnd = dest.distance(endNode.getLocation());
+            MapNode destNode = new MapNode(dest);
+            destNode = nodes.get(nodes.indexOf(destNode));
+            double weight = edge.getLength();
+            double destNodeDistance = destNode.getDistance();
+            double distanceFromStart = current.getDistance() + weight;
+
+            if (distanceFromStart + distanceFromEnd < destNodeDistance) {
+                destNode.setDistance(distanceFromStart + distanceFromEnd);
+                pQueue.add(destNode);
+                parent.put(dest, current.getLocation());
             }
-
         }
-
-        if (!isFound) {
-            System.out.println("Node not found");
-            return null;
-        }
-
-        return constructPath(parent, startNode, endNode);
     }
 
 }
